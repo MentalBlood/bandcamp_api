@@ -1,13 +1,11 @@
-import requests
-from bs4 import BeautifulSoup
+from getPage import getPageSelenium as getPage, finish
 import json
 
 
 
 def getArtistUrl(artist_name):
-	
-	search_request = requests.get(f'https://bandcamp.com/search?q={artist_name}')
-	search_page = BeautifulSoup(search_request.text, 'html.parser')
+
+	search_page = getPage(f'https://bandcamp.com/search?q={artist_name}')
 	search_results_elements = search_page.select('.searchresult')
 	
 	artists_elements = [*filter(
@@ -19,22 +17,20 @@ def getArtistUrl(artist_name):
 	return first_artist_url.strip()
 
 
-def getAlbums(artist_name_or_url, artist_url=None):
+def _getAlbumTitleFromElement(element):
+	title_text = element.select('.title')[0].text
+	title_text_first_line = title_text.strip().split('\n')[0]
+	return title_text_first_line
+
+
+def getAlbums(artist_name_or_url):
 
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
-	artist_request = requests.get(artist_url)
-	artist_page = BeautifulSoup(artist_request.text, 'html.parser')
+	artist_page = getPage(artist_url)
 	albums_links_elements = artist_page.select('.music-grid-item > a')
-	# print(albums_links_elements)
 	
 	return {
-		e.select('.title')[0]: {
+		_getAlbumTitleFromElement(e): {
 			'link': artist_url + e['href']
 		} for e in albums_links_elements
 	}
-
-
-
-result = getAlbums('hiemal')
-print(result)
-# print(json.dumps(result, indent=4))
