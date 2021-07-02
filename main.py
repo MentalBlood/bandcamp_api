@@ -34,6 +34,29 @@ def _getAlbumTitleFromElement(element):
 	return title_text_first_line
 
 
+def getAlbumBuyInfo(album_url):
+
+	print('getAlbumBuyInfo', album_url)
+	
+	album_page = getPage(album_url)
+	digital_albom_buy_info = album_page.select('.buyItem.digital')
+	if not len(digital_albom_buy_info):
+		return None
+	else:
+		digital_albom_buy_info = digital_albom_buy_info[0]
+
+	cost = None
+	if_non_free = digital_albom_buy_info.select('h4.ft .nobreak .base-text-color')
+	if len(if_non_free):
+		cost = if_non_free[0].text
+	else:
+		cost = 0
+
+	return {
+		'cost': cost
+	}
+
+
 def getAlbums(artist_name_or_url):
 
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
@@ -42,7 +65,8 @@ def getAlbums(artist_name_or_url):
 	
 	return {
 		_getAlbumTitleFromElement(e): {
-			'link': artist_url + e['href']
+			'link': artist_url + e['href'],
+			'buy_info': getAlbumBuyInfo(artist_url + e['href'])
 		} for e in albums_links_elements
 	}
 
