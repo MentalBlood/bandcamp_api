@@ -37,6 +37,7 @@ def _getAlbumTitleFromElement(element):
 def getAlbums(artist_name_or_url):
 
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
+	print('_____________________________ artist_url', artist_url)
 	artist_page = getPage(artist_url)
 	albums_links_elements = artist_page.select('.music-grid-item > a')
 	
