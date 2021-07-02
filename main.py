@@ -1,5 +1,16 @@
-from getPage import getPageSelenium as getPage, finish
+from getPage import finish
 import json
+
+
+
+engine = 'selenium'
+
+if engine == 'selenium':
+	from getPage import getPageSelenium as getPage
+	from paralleling import composeSequentially as compose
+elif engine == 'requests':
+	from getPage import getPageRequests as getPage
+	from paralleling import composeInParallel as compose
 
 
 
@@ -36,8 +47,6 @@ def _getAlbumTitleFromElement(element):
 
 def getAlbumBuyInfo(album_url):
 
-	print('getAlbumBuyInfo', album_url)
-	
 	album_page = getPage(album_url)
 	digital_albom_buy_info = album_page.select('.buyItem.digital')
 	if not len(digital_albom_buy_info):
@@ -62,13 +71,18 @@ def getAlbums(artist_name_or_url):
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
 	artist_music_page = getPage(f'{artist_url}/music')
 	albums_links_elements = artist_music_page.select('.music-grid-item > a')
-	
-	return {
-		_getAlbumTitleFromElement(e): {
+
+	result = compose(
+		albums_links_elements,
+		_getAlbumTitleFromElement,
+		lambda e: {
 			'link': artist_url + e['href'],
 			'buy_info': getAlbumBuyInfo(artist_url + e['href'])
-		} for e in albums_links_elements
-	}
+		},
+		f"Geting albums by artist '{getArtistTrueName(artist_url)}'"
+	)
+	
+	return result
 
 
 def getArtistTrueName(artist_name_or_url):
