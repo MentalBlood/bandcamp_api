@@ -1,7 +1,15 @@
 import main as api
 import json
 
-result = api.getAlbums('death on cassete')
+
+
+artists = [
+	'akhlys',
+	'frontierer'
+]
+
+result = {a: api.getAlbums(a) for a in artists}
+
 with open('output.json', 'w', encoding='utf8') as f:
 	json.dump(result, f, indent=4)
 

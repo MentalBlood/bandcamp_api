@@ -8,13 +8,24 @@ def getArtistUrl(artist_name):
 	search_page = getPage(f'https://bandcamp.com/search?q={artist_name}')
 	search_results_elements = search_page.select('.searchresult')
 	
+	albums_elements = [*filter(
+		lambda e: json.loads(e['data-search'])['type'] == 'a', 
+		search_results_elements
+	)]
+	if len(albums_elements):
+		first_album_url = albums_elements[0].select('.itemurl')[0].text
+		first_album_artis_url = first_album_url.split('bandcamp.com')[0] + 'bandcamp.com'
+		return first_album_artis_url
+	
 	artists_elements = [*filter(
 		lambda e: json.loads(e['data-search'])['type'] == 'b', 
 		search_results_elements
 	)]
-	first_artist_url = artists_elements[0].select('.itemurl')[0].text
-	
-	return first_artist_url.strip()
+	if len(artists_elements):
+		first_artist_url = artists_elements[0].select('.itemurl')[0].text.strip()
+		return first_artist_url
+
+	return None
 
 
 def _getAlbumTitleFromElement(element):
