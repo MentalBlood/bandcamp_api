@@ -37,12 +37,18 @@ def _getAlbumTitleFromElement(element):
 def getAlbums(artist_name_or_url):
 
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
-	print('_____________________________ artist_url', artist_url)
-	artist_page = getPage(f'{artist_url}/music')
-	albums_links_elements = artist_page.select('.music-grid-item > a')
+	artist_music_page = getPage(f'{artist_url}/music')
+	albums_links_elements = artist_music_page.select('.music-grid-item > a')
 	
 	return {
 		_getAlbumTitleFromElement(e): {
 			'link': artist_url + e['href']
 		} for e in albums_links_elements
 	}
+
+
+def getArtistTrueName(artist_name_or_url):
+	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
+	artist_music_page = getPage(f'{artist_url}/music')
+	artist_true_name = artist_music_page.select('#band-name-location .title')[0].text.strip()
+	return artist_true_name

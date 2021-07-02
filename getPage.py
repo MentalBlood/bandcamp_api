@@ -9,6 +9,7 @@ from selenium.webdriver.chrome.options import Options
 
 options = Options()
 options.headless = True
+options.add_argument('log-level=2')
 driver = webdriver.Chrome(options=options)
 
 import requests
