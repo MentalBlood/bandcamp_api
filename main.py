@@ -14,7 +14,7 @@ def getArtistUrl(artist_name):
 	)]
 	if len(albums_elements):
 		first_album_url = albums_elements[0].select('.itemurl')[0].text
-		first_album_artis_url = first_album_url.split('bandcamp.com')[0] + 'bandcamp.com'
+		first_album_artis_url = first_album_url.strip().split('bandcamp.com')[0] + 'bandcamp.com'
 		return first_album_artis_url
 	
 	artists_elements = [*filter(
@@ -38,7 +38,7 @@ def getAlbums(artist_name_or_url):
 
 	artist_url = artist_name_or_url if artist_name_or_url.endswith('bandcamp.com') else getArtistUrl(artist_name_or_url)
 	print('_____________________________ artist_url', artist_url)
-	artist_page = getPage(artist_url)
+	artist_page = getPage(f'{artist_url}/music')
 	albums_links_elements = artist_page.select('.music-grid-item > a')
 	
 	return {
