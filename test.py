@@ -16,5 +16,3 @@ result = api.compose(artists, api.getArtistTrueName, api.getAlbums, 'Geting arti
 
 with open('output.json', 'w', encoding='utf8') as f:
 	json.dump(result, f, indent=4)
-
-api.finish()

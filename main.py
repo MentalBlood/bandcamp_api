@@ -1,16 +1,20 @@
-from getPage import finish
 import json
 
 
 
-engine = 'selenium'
+engine = 'requests'
 
-if engine == 'selenium':
-	from getPage import getPageSelenium as getPage
-	from paralleling import composeSequentially as compose
-elif engine == 'requests':
-	from getPage import getPageRequests as getPage
+getPageModule = getattr(
+	__import__(f'getPage.{engine}'),
+	engine
+)
+
+getPage = getPageModule.getPage
+
+if getPageModule.paralleling:
 	from paralleling import composeInParallel as compose
+else:
+	from paralleling import composeSequentially as compose
 
 
 
@@ -55,9 +59,10 @@ def getAlbumBuyInfo(album_url):
 		digital_albom_buy_info = digital_albom_buy_info[0]
 
 	cost = None
-	if_non_free = digital_albom_buy_info.select('h4.ft .nobreak .base-text-color')
-	if len(if_non_free):
-		cost = if_non_free[0].text
+	costs_if_non_free = digital_albom_buy_info.select('h4.ft .nobreak .base-text-color')
+	is_non_free = len(costs_if_non_free)
+	if is_non_free:
+		cost = costs_if_non_free[0].text
 	else:
 		cost = 0
 
